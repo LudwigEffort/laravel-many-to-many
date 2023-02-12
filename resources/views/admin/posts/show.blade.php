@@ -4,20 +4,24 @@
     <div class="container">
         <h1>{{ $post->title }}</h1>
         @if (isset($post->category->name))
-            <h2>Category: {{ $post->category->name }}</h2>
+            <h2>Category: <a href="{{ route('admin.categories.show', ['category' => $post->category]) }}">{{$post->category->name }}</a></h2>
         @endif
 
         @if ($post->tags->all())
-            <h2>Tags</h2>
-            @foreach ($post->tags as $tag)
-                {{ $tag->name }}{{ $loop->last ? '' : ', ' }}
-            @endforeach
+            <div>
+                @foreach ($post->tags as $tag)
+                    <a href="{{ route('admin.tags.show', ['tag' => $tag]) }}">{{ $tag->name }}</a>{{ $loop->last ? '' : ', ' }}
+                @endforeach
+            </div>
         @endif
 
         {{-- <img src="{{ $post->image }}" alt="{{ $post->title }}"> --}}
-        <img src="{{ asset('storage/'. $post->uploaded_img) }}" alt="{{ $post->title }}">
-        <p>
+        <div class="clearfix">
+            <img class="float-start" src="{{ asset('storage/'. $post->uploaded_img) }}" alt="{{ $post->title }}">
             {{ $post->content }}
-        </p>
+        </div>
     </div>
 @endsection
+
+
+

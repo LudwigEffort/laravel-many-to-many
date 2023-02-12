@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Tag;
 use App\Post;
 use App\Category;
 use Illuminate\Http\Request;
@@ -22,8 +23,10 @@ class PostController extends Controller
             'max:100',
         ],
         'category_id'   => 'required|integer|exists:categories,id',
+        'tags'          => 'array', // validazione tags
+        'tags.*'        => 'integer|exists:tags,id', // validazione tags
         'image'         => 'string|max:100',
-        'uploaded_img'  => 'image|max:1024',
+        'uploaded_img'  => 'nullable|image|max:1024',
         'content'       => 'string',
         'excerpt'       => 'string',
     ];
@@ -50,11 +53,13 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all('id', 'name');
+        $tags = Tag::all();
 
         //ddd($categories);
 
         return view('admin.posts.create', [
             'categories'    => $categories,
+            'tags'          => $tags,
         ]);
 
     }
@@ -75,7 +80,7 @@ class PostController extends Controller
 
         $data = $request->all();
 
-        //ddd($data);
+        //dd($data);
 
         //ricorda di fare il chmod 777 alla cartella storage/app/public
         //$img_path = Storage::put('uploads', $data['uploaded_img']);
@@ -83,14 +88,17 @@ class PostController extends Controller
 
         // salvare i dati nel db
         $post = new Post();
-        $post->title        = $data['title'];
-        $post->slug         = $data['slug'];
-        $post->category_id        = $data['category_id'];
-        $post->image        = $data['image'];
-        $post->uploaded_img = $img_path;
-        $post->content      = $data['content'];
-        $post->excerpt      = $data['excerpt'];
+        $post->title            = $data['title'];
+        $post->slug             = $data['slug'];
+        $post->category_id      = $data['category_id'];
+        $post->image            = $data['image'];
+        $post->uploaded_img     = $img_path;
+        $post->content          = $data['content'];
+        $post->excerpt          = $data['excerpt'];
         $post->save();
+
+        // associamo i post appena creato ai tag selezionati
+        $post->tags()->attach($data['tags']);
 
         // ridirezionare (e non ritornare una view)
         return redirect()->route('admin.posts.show', ['post' => $post]);
@@ -115,7 +123,18 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        return view('admin.posts.edit', compact('post'));
+        $categories = Category::all('id', 'name');
+        $tags = Tag::all();
+
+        // cosi midifichiamo i post, le categorie e i tag
+        return view('admin.posts.edit', [
+            'post'          => $post,
+            'categories'    => $categories,
+            'tags'          => $tags,
+        ]);
+
+        // cosi modifichiamo solamente il post
+        //return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -133,17 +152,29 @@ class PostController extends Controller
 
         $data = $request->all();
 
-        $img_path = Storage::put('uploads', $data['uploaded_img']);
-        Storage::delete($post->uploaded_img);
+
+        //$img_path = Storage::put('uploads', $data['uploaded_img']);
+        //Storage::delete($post->uploaded_img);
+
+        // per risolvere img error dopo l'edit dobbiamo fare il seguente condizionale
+        if (isset($data['uploaded_img'])) {
+            $img_path = Storage::put('uploads', $data['uploaded_img']);
+            Storage::delete($post->uploaded_img);
+        } else {
+            $img_path = $post->uploaded_img;
+        }
 
         // salvare i dati nel db
-        $post->slug    = $data['slug'];
-        $post->title   = $data['title'];
-        $post->image   = $data['image'];
+        $post->slug         = $data['slug'];
+        $post->title        = $data['title'];
+        $post->image        = $data['image'];
         $post->uploaded_img = $img_path;
-        $post->content = $data['content'];
-        $post->excerpt = $data['excerpt'];
+        $post->content      = $data['content'];
+        $post->excerpt      = $data['excerpt'];
         $post->update();
+
+        // aggiorniamo i tags dei post
+        $post->tags()->sync($data['tags']);
 
         // ridirezionare e non ritornare una view (spiegare il motivo)
         return redirect()->route('admin.posts.show', ['post' => $post]);
@@ -158,7 +189,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        $post->tags()->detach(); // con il metodo detach elimina tutte le righe associate alla tabella ponte
+        $post->tags()->detach(); // con il metodo detach elimina tutte le righe associate alla tabella ponte (in questo caso i tags associati al post)
         //$post->tags()->sync([]); // con sync sincronizza i tag associati al post, passando un array vuoto cancellera tutti i tag associati
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success_delete', $post);

@@ -38,12 +38,12 @@
                 </div>
             </div>
 
-            {{-- select --}}
+            {{-- categories --}}
             <div class="mb-3">
                 <label for="category_id" class="form-label">Category</label>
                 <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required aria-label="select example">
                     @foreach ($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <option value="{{ $category->id }}" @if ($category->id == old('category_id')) selected @endif>{{ $category->name }}</option>
                     @endforeach
                 </select>
                 <div class="invalid-feedback">
@@ -58,6 +58,32 @@
                 <div class="invalid-feedback">Example invalid select feedback</div>
             </div>
 
+            {{-- tags --}}
+            {{-- Questo input form deve tornare come output un array che contiene gli id dei tags --}}
+            <div class="col-12">
+                <h2>Tags:</h2>
+                @foreach ($tags as $tag)
+                    <div class="form-check">
+                        <input
+                            id="tag-{{ $tag->id }}"
+                            class="form-check-input"
+                            type="checkbox"
+                            value="{{ $tag->id }}"
+                            name="tags[]"
+                            @if (in_array($tag->id, old('tags', []))) checked @endif
+                        >
+                        <label class="form-check-label" for="tag-{{ $tag->id }}">
+                            {{ $tag->name }}
+                        </label>
+
+                    </div>
+                @endforeach
+                @if ($errors->has('tags') || $errors->has('tags.*'))
+                <div>
+                    Invalid Tags!
+                </div>
+                @endif
+            </div>
 
             {{-- image --}}
             <div class="mb-3">

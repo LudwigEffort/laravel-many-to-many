@@ -39,6 +39,57 @@
                 </div>
             </div>
 
+            {{-- categories --}}
+            <div class="mb-3">
+                <label for="category_id" class="form-label">Category</label>
+                <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required aria-label="select example">
+                    @foreach ($categories as $category)
+                        {{-- TODO: controllare che la categoria non sia nulla --}}
+                        <option value="{{ $category->id }}" @if ($category->id == old('category_id', $post->category->id)) selected @endif>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+                <div class="invalid-feedback">
+                    @error('category_id')
+                        <ul>
+                            @foreach ($errors->get('category_id') as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @enderror
+                </div>
+                <div class="invalid-feedback">Example invalid select feedback</div>
+            </div>
+
+            {{-- tags --}}
+            {{-- Questo input form deve tornare come output un array che contiene gli id dei tags --}}
+            <div class="col-12">
+                <h2>Tags:</h2>
+                @foreach ($tags as $tag)
+                    <div class="form-check">
+                        <input
+                            id="tag-{{ $tag->id }}"
+                            class="form-check-input @error('tags') is-invalid @enderror"
+                            type="checkbox"
+                            value="{{ $tag->id }}"
+                            name="tags[]"
+                            @if (in_array($tag->id, old('tags', $post->tags->pluck('id')->all()))) checked @endif
+                        >
+                        <label class="form-check-label" for="tag-{{ $tag->id }}">
+                            {{ $tag->name }}
+                        </label>
+                        <div class="invalid-feedback">
+                            @error('tags')
+                                <ul>
+                                    @foreach ($errors->get('category_id') as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            @enderror
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
             {{-- image --}}
             <div class="mb-3">
                 <label for="image" class="form-label">URL-Image</label>
@@ -59,7 +110,7 @@
             <div class="mb-3">
                 <label for="uploaded_img" class="form-label">Image</label>
                 <input class="form-control @error('uploaded_img') is-invalid @enderror"
-                type="file" id="uploaded_img" name="uploaded_img">
+                type="file" id="uploaded_img" name="uploaded_img" value="{{ old('uploaded_img', $post->uploaded_img) }}">
                 <div class="invalid-feedback">
                     @error('uploaded_img')
                         <ul>
@@ -71,7 +122,7 @@
                 </div>
 
                 <div>
-                    <img src="{{ asset('storage/'. $post->uploaded_img) }}" alt="{{ $post->title }}">
+                    <img src="{{ asset('storage/' . $post->uploaded_img) }}" alt="{{ $post->title }}">
                 </div>
             </div>
 

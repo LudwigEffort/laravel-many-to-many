@@ -26,12 +26,13 @@
                     <td>{{ $post->slug }}</td>
                     <td>{{ $post->title }}</td>
                     <td>
-                        {{-- <a href="{{ route('admin.posts.edit', ['post' => $post]) }}" class="btn btn-warning">Edit</a> --}}
-                        {{ $post->category->name ?? 'null' }}
+                        @if ($post->category)
+                            <a href="{{ route('admin.categories.show', ['category' => $post->category]) }}">{{$post->category->name }}</a>
+                        @endif
                     </td>
                     <td>
                         @foreach ($post->tags as $tag)
-                            {{ $tag->name }}{{ $loop->last ? '' : ', ' }}
+                            <a href="{{ route('admin.tags.show', ['tag' => $tag]) }}">{{ $tag->name }}</a>{{ $loop->last ? '' : ', ' }}
                         @endforeach
                     </td>
                     <td>
