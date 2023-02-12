@@ -30,4 +30,5 @@ Route::middleware('auth') //approfondire il middleware
         Route::get('/', 'PageController@dashboard')->name('dashboard');
         Route::resource('posts', 'PostController');
         Route::resource('categories', 'CategoryController');
+        Route::resource('tags', 'TagController');
     });

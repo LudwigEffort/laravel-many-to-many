@@ -158,6 +158,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        $post->tags()->detach(); // con il metodo detach elimina tutte le righe associate alla tabella ponte
+        //$post->tags()->sync([]); // con sync sincronizza i tag associati al post, passando un array vuoto cancellera tutti i tag associati
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success_delete', $post);
     }
