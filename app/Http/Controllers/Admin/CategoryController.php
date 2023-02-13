@@ -133,4 +133,17 @@ class CategoryController extends Controller
         // ridirezionare
         return redirect()->route('admin.categories.index')->with('success_delete', $category);
     }
+
+    public function slug(Request $request){
+        // localhost:8000/admin/categories/slug?title=ciao a tutti
+        $title = $request->query('title');
+
+        // risponde con il primo slug disponibile restituito in formato JSON per essere usato da JS
+        $slug = Category::getSlug($title);
+
+        return response()->json([
+            'slug' => $slug,
+        ]);
+    }
+
 }
