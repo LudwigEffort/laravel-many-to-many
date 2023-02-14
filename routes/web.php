@@ -29,7 +29,7 @@ Route::middleware('auth') //approfondire il middleware
     ->group(function(){
         Route::get('/', 'PageController@dashboard')->name('dashboard');
         Route::resource('posts', 'PostController');
-        Route::get('categories/slug', 'CategoryController@slug')->name('categories.slug');
+        Route::get('categories/slug', 'CategoryController@slug')->name('categories.slug'); // va messo prima
         Route::resource('categories', 'CategoryController');
         Route::resource('tags', 'TagController');
     });

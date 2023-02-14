@@ -4,6 +4,9 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+const { default: Axios, default: axios } = require('axios');
+const { data } = require('jquery');
+
 require('./bootstrap');
 
 require('bootstrap'); // importa la libreria boostrap
@@ -32,3 +35,26 @@ window.Vue = require('vue');
 //const app = new Vue({
 //    el: '#app',
 //});
+
+
+const inputTitle = document.querySelector('[data-sluger=title]'); // selettore css
+const inputSlug = document.querySelector('[data-sluger=slug]'); // selettore css
+const btnGetSlug = document.querySelector('[data-sluger=button]'); // selettore css
+
+if (inputTitle && inputSlug && btnGetSlug) {
+    inputTitle.addEventListener('focusout', function(){ // fix: il problema era il condizionale if (avevo scritto !== al posto di ===)
+        if(inputSlug.value === ''){
+           getSlug(inputTitle.value);
+        }
+    });
+
+    btnGetSlug.addEventListener('click', function(){
+        getSlug(inputTitle.value);
+    });
+
+    function getSlug(title){
+        // richiesta al server dello slug
+        axios.get('/admin/categories/slug?title=' + title)
+            .then(response => inputSlug.value = response.data.slug);
+    }
+}
