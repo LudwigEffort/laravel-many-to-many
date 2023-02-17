@@ -14,19 +14,22 @@ class UserSeeder extends Seeder
     public function run()
     {
         $users = [
-            //user1
+
+            //user 1
             [
                 'name' => 'enrico',
                 'email' => 'enrico.fermi@gmail.com',
                 'password' => Hash::make('password'),
             ],
-            //user2
+
+            //user 2
             [
                 'name' => 'werner',
                 'email' => 'werner.heisenberg@gmail.com',
                 'password' => Hash::make('password'),
             ],
-            //user3
+
+            //user 3
             [
                 'name' => 'albert',
                 'email' => 'albert.einstein@gmail.com',
